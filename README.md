@@ -5,11 +5,11 @@
 - Identify unusual Capsicum accessions in NPGS
 - Determine true number of species within Capsicum genus
 
-- Things to do
+# Things to do
 
 - Data
     - Some features are missing.  What do we do?
-    -Visualize data?
+    - Visualize data?
 - Clustering
     - Supervised
         - Evaluation
