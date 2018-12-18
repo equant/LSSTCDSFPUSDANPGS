@@ -18,13 +18,16 @@ foo = [x for x in foo if "accessiondetail" in x.attrs['href']]
 
 data = [(x.attrs['href'], x.string) for x in foo]
 
-TESTING = True
+from random import shuffle
+shuffle(data)
+
+TESTING = False
 if TESTING:
     #my_test_url = 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=1047133'
     #data = np.array(data)
     #_idx = np.where(data[:,0] == my_test_url)
     #data = data[_idx]
-    data = data[:600]
+    data = data[:10]
 
 df = pd.DataFrame(data, columns=['url', 'plant_id'])
 df['id'] = [int(x.split('?')[-1].split("=")[-1]) for x in df['url']] 
@@ -58,6 +61,7 @@ for plant_id, row in df.iterrows():
         all_values       = evaluation_table.select("tr")[2].select("td")
         all_values       = [x.string for x in all_values]
 
+
         column_table_headers = evaluation_table.select("tr")[1].select("th")[1:]
         saved_values = []
         column_names = []
@@ -77,6 +81,16 @@ for plant_id, row in df.iterrows():
         print(f"No features for this accession")
         df_full.loc[plant_id, 'error'] = 'no features'
         continue
+
+    try:
+        location_row = tables[34].select("tr")[0]
+        if location_row.select("th")[0].string == 'Collected from:':
+            loc = location_row.select("td")[0].string.strip()
+            if len(log) > 0:
+                values.append(loc)
+                column_names.append('scraped_location')
+    except:
+        pass
     
     latin_name = html.select('h2')[0].select('a')[0].string.strip()
     df.loc[plant_id, 'latin_name'] = latin_name
@@ -96,7 +110,7 @@ for plant_id, row in df.iterrows():
 
     count += 1
     print(f"Sleep... {count}/{len(df)}")
-    sleep(randint(0,2))
+    sleep(randint(3,7))
 
 df.to_csv(f"capsicum_ml_{len(df)}.csv")
 df_full.to_csv(f"capsicum_full_{len(df_full)}.csv")
